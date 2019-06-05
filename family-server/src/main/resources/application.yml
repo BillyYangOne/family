@@ -11,6 +11,21 @@ spring:
   #项目名称
   application:
     name: family-server
+  # flywaydb配置
+  flyway:
+    enabled: true
+    encoding: UTF-8
+    locations: classpath:db
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    validate-on-migrate: true
+    schemas: public
+    table: flyway_schema_htrueistory
+    baseline-on-migrate: true
+    out-of-order: true
+    baseline-version: 1.0.0
+    baseline-description: "项目初始化"
 
 # mybatis plus 配置
 mybatis-plus:
@@ -48,3 +63,4 @@ mybatis-plus:
 logging:
   path: /
   file: family-server.log
+
