@@ -47,6 +47,21 @@ export default [
           },
         ],
       },
+      //member
+      {
+        path: '/member',
+        name: 'member',
+        icon: 'table',
+        routes: [
+          {
+            path: '/member/member',
+            name: 'member',
+            component: './Member/Member'
+          }
+        ]
+      },
+
+
       // forms
       {
         path: '/form',
