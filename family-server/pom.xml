@@ -24,6 +24,13 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- mybatis plus 依赖  -->
 		<dependency>
 			<groupId>com.baomidou</groupId>
