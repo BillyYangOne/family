@@ -5,23 +5,24 @@ import lombok.Data;
 
 import java.util.Date;
 
+
 /**
- * 成员表
+ * 账户表
  */
-@TableName("family_members")
+@TableName("sys_account")
 @Data
-public class FamilyMembers {
+public class SysAccount {
 
     private String id;
+    private String account_name;
+    private String account_pwd;
     private String name;
-    private Integer age;
-    private Integer sex;
-    private Date birthday;
-    private String familyStatus;
-    private String personalProfile;
-    private Date createTime;
+    private String telephone;
+    private Integer type;
+    private Integer status;
+    private Date create_time;
     private String creator;
-    private Date updateTime;
+    private Date update_time;
     private String updater;
     private String comments;
 }

@@ -1,6 +1,12 @@
 
-#数据源配置
+
+server:
+  port: 9090
 spring:
+  #项目名称
+  application:
+    name: family-server
+  #数据源配置
   datasource:
     url: jdbc:postgresql://127.0.0.1:5432/postgres
     username: postgres
@@ -8,9 +14,7 @@ spring:
     initialSize: 1
     maxActive: 20
     maxWait: 60000
-  #项目名称
-  application:
-    name: family-server
+
   # flywaydb配置
   flyway:
     enabled: true
@@ -63,5 +67,4 @@ mybatis-plus:
 logging:
   path: /
   file: family-server.log
-server:
-  port: 9090
+

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "MemberManageController")
 @RestController
-@RequestMapping("member")
+@RequestMapping("family_server")
 public class MemberManageController extends BaseController {
 
     @Autowired
@@ -34,6 +34,8 @@ public class MemberManageController extends BaseController {
         logger.debug("开始。。。");
         System.out.println(name);
         Page<FamilyMembers> page = new Page<>();
+        page.setCurrent(1);
+        page.setSize(10);
         IPage<FamilyMembers> membersByPage = manageService.getMembersByPage(page);
         Messager result = messager.successObjectResponse(membersByPage);
         return result;

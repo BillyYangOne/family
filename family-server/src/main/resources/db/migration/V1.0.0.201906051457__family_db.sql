@@ -3,6 +3,7 @@ create table family_members(
 	id varchar(32) not null,
 	name varchar(200) not null,
 	age int2,
+    sex int2 not null,
 	birthday date,
 	family_status varchar(20) not null,
 	personal_profile text,

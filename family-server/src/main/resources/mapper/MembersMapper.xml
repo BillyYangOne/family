@@ -6,10 +6,12 @@
         SELECT ID,
             NAME,
             age,
+            sex,
             birthday,
             family_status,
             personal_profile,
-            create_time
+            create_time,
+            creator
         FROM
             family_members
     </select>
