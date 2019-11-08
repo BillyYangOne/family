@@ -68,3 +68,8 @@ logging:
   path: /
   file: family-server.log
 
+# kettle 配置
+kettle:
+  path: etl
+
+

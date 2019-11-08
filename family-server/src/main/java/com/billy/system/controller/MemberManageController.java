@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "MemberManageController")
@@ -28,7 +29,7 @@ public class MemberManageController extends BaseController {
      */
     @ApiOperation(value = "查询家庭成员", notes = "查询家庭成员")
     @ApiImplicitParams(@ApiImplicitParam(name = "name", value = "姓名", paramType = "query", dataType = "String"))
-    @RequestMapping("getMembers")
+    @RequestMapping(value = "getMembers",  method = RequestMethod.GET)
     public Object getMembers(String name){
 
         logger.debug("开始。。。");

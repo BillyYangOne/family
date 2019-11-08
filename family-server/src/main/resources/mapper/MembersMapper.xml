@@ -16,4 +16,14 @@
             family_members
     </select>
 
+    <select id="getMemberById" >
+        select
+            *
+        from family_members
+        where 1=1
+        <if test="id != null and id !='' ">
+            id= #{id}
+        </if>
+    </select>
+
 </mapper>
