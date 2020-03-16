@@ -8,7 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.LongBinaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,7 +25,11 @@ public class Java8Sample {
     public static void main(String[] args) {
 
         try {
-            new Java8Sample().atomicity();
+
+            String dateStr = "2019年10月01日";
+            System.out.println(dateStr.substring(0, 8));
+//            new Java8Sample().seniorPart();
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -141,34 +148,36 @@ public class Java8Sample {
 
         List<Person> people = Arrays.asList(
                 new Person("Billy", 27),
-                new Person("Yang", 32)
+                new Person("Billy1", 27),
+                new Person("Yang", 32),
+                new Person("Yang1", 32)
         );
 
-        List<Person> filterPerson = people.stream().filter(person -> person.name.startsWith("B")).collect(Collectors.toList());
-        System.out.println(filterPerson);
+//        List<Person> filterPerson = people.stream().filter(person -> person.name.startsWith("B")).collect(Collectors.toList());
+//        System.out.println(filterPerson);
 
         //group by age
         Map<Integer, List<Person>> groupByAge = people.stream().collect(Collectors.groupingBy(person -> person.age));
-        groupByAge.forEach((age, person) -> System.out.format("age %d , person %s \n", age, person));
+        groupByAge.forEach((age, person) -> System.out.format("age %d , person %s \n", age, person.get(0)));
 
         //average
-        Double averageAge = people.stream().collect(Collectors.averagingInt(person -> person.age));
-        System.out.println("average age:" + averageAge);
-
-        //summarizing
-        IntSummaryStatistics ageSummary = people.stream().collect(Collectors.summarizingInt(p -> p.age));
-        System.out.println(ageSummary);
-        System.out.println(ageSummary.getCount());
-
-        //
-        String phrase = people.stream().map(person -> person.name)
-                .collect(Collectors.joining(" and ", "In Germany ", " are of legal age."));
-        System.out.println(phrase);
-
-        //并行流
-        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
-        int parallelism = forkJoinPool.getParallelism();
-        System.out.println("公共线程池：" + parallelism);
+//        Double averageAge = people.stream().collect(Collectors.averagingInt(person -> person.age));
+//        System.out.println("average age:" + averageAge);
+//
+//        //summarizing
+//        IntSummaryStatistics ageSummary = people.stream().collect(Collectors.summarizingInt(p -> p.age));
+//        System.out.println(ageSummary);
+//        System.out.println(ageSummary.getCount());
+//
+//        //
+//        String phrase = people.stream().map(person -> person.name)
+//                .collect(Collectors.joining(" and ", "In Germany ", " are of legal age."));
+//        System.out.println(phrase);
+//
+//        //并行流
+//        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
+//        int parallelism = forkJoinPool.getParallelism();
+//        System.out.println("公共线程池：" + parallelism);
 
 
     }
@@ -302,7 +311,7 @@ public class Java8Sample {
      * 关闭 executor
      * @param executor
      */
-    public static void stop(ExecutorService executor) {
+    private static void stop(ExecutorService executor) {
         try {
             executor.shutdown();
             executor.awaitTermination(60, TimeUnit.SECONDS);
@@ -328,7 +337,81 @@ public class Java8Sample {
                 .forEach(i -> executor.submit(atomicInteger::incrementAndGet));
         stop(executor);
         System.out.println(atomicInteger.get());
+
     }
+
+    /**
+     * LongAddr 是 AtomicLong 的替代
+     */
+    private void longAddr() {
+
+        LongAdder longAdder = new LongAdder();
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        IntStream.range(0, 1000)
+                .forEach(i -> executorService.submit(longAdder::increment));
+        stop(executorService);
+
+        System.out.println(longAdder.sumThenReset());
+    }
+
+    /**
+     * LongAccumulator 是 LongAddr 的更通用的版本
+     *  以类型为 LongBinaryOperator lambda 表达式构建
+     *
+     */
+    private void longAccumulator() {
+
+        LongBinaryOperator op = (x, y) -> 25 * x + y;
+        LongAccumulator accumulator = new LongAccumulator(op, 1L);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        IntStream.range(0, 1)
+                .forEach(i -> executor.submit(() -> accumulator.accumulate(i)));
+        stop(executor);
+
+        System.out.println(accumulator.getThenReset());
+
+    }
+
+
+    /**
+     * concurrentMap
+     */
+    private void concurrentMap() {
+
+        ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
+        map.put("foo", "bar");
+        map.put("han", "solo");
+        map.put("Billy", "Yang");
+        map.put("Json", "Michael");
+
+        // 在key不存在的情况下，才会插入
+        map.putIfAbsent("foo", "name");
+
+        // 当传入的key 不存在的情况下，返回默认值
+        Object orDefault = map.getOrDefault("Yang", "Lako");
+        System.out.format(" orDefault : %s\n", orDefault);
+
+        map.forEach((key, value) -> System.out.format("%s = %s \n", key, value));
+
+        //replaceAll 接受类型为 BiFunction 的 lambda 表达式。
+        // BiFunction 接受两个参数并返回一个值，作为当前键的新值
+        map.replaceAll((key, value) -> "Billy".equals(key) ? "Le" : value);
+        System.out.println(map.get("Billy"));
+
+        Object result = map.search(1, (key, value) -> {
+            System.out.println(Thread.currentThread().getName());
+            if ("Billy".equals(key)) {
+                return value;
+            }
+            return null;
+        });
+        System.out.println("Result: " + result);
+
+
+    }
+
+
 
 }
 
